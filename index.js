@@ -148,4 +148,37 @@ class EmployeeTracker {
         }
     }
 
-    
+    async addEmployee () {
+        try {
+            const [roles] = (await this.connection).execute('SELECT * FROM role');
+            const [employees] = (await this.connection).execute('SELECT * FROM employee');
+            const { firstName, lastName, role, manager } = await inquirer.prompt ([
+                {
+                    name: 'firstName',
+                    type: 'input',
+                    message: "What is the employee's first name?"
+                },
+                {
+                    name: 'lastName',
+                    type: 'input',
+                    message: "What is the employee's last name?"
+                },
+                {
+                    name: 'role',
+                    type: 'list',
+                    message: "What is the employee's role?",
+                    choices: roles.map(role => role.title)
+                },
+                {
+                    name: 'manager',
+                    type: 'list',
+                    message: "Who is the employee's manager?",
+                    choices: employees.map(employee => `${employee.first_name} ${employee.last_name}`)
+                }
+            ]);
+
+            const roleId = roles.find(r => r.title === role).id;
+            const managerId = employees.find(e => `${e.first_name} ${e.last_name}` === manager).id;
+            
+        }
+    }
