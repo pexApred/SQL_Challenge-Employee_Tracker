@@ -1,5 +1,5 @@
 const inquirer = require("inquirer");
-const mysql = require('mysql/promise');
+const mysql = require('mysql2/promise');
 
 class EmployeeTracker {
     constructor() {
@@ -113,3 +113,39 @@ class EmployeeTracker {
             this.start();
         }
     }
+
+    async addRole () {
+        try {
+            const [departments] = await this.connection.execute('SELECT * FROM department');
+            const department = await inquirer.prompt ({
+                name: 'list',
+                message: 'WHich department does the role belong to?',
+                choices: departments.map(department => department.name)              
+            });
+
+            const { title, salary } = await inquirer.prompt([
+                {
+                    name: 'title',
+                    type: 'input',
+                    message: 'What is the title of the role?'
+                },
+                {
+                    name: 'salary',
+                    type: 'input',
+                    message: 'What is the salary of the role?'
+                },
+
+            ]);
+
+            const departmentId = departments.find(dept => dept.name === department).id;
+
+            await this.connection.execute('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [title, salary, departmentId]);
+            console.log(`Added ${title} role to the database.`);
+            this.start();
+        } catch (err) {
+            console.log(err);
+            this.start();
+        }
+    }
+
+    
