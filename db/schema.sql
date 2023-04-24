@@ -28,6 +28,6 @@ CREATE TABLE employee (
     REFERENCES role (id)
     ON DELETE CASCADE,
     FOREIGN KEY (manager_id)
-    REFERNCES employee (id)
+    REFERENCES employee (id)
     ON DELETE CASCADE
 );
