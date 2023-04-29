@@ -180,5 +180,45 @@ class EmployeeTracker {
             const roleId = roles.find(r => r.title === role).id;
             const managerId = employees.find(e => `${e.first_name} ${e.last_name}` === manager).id;
             
+            (await this.connection).execute('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [firstName, lastName, roleId, managerId]);
+            console.log(`Added ${firstName} ${lastName} to the database.`);
+            this.start();
+        } catch (err) {
+            console.log(err);
+            this.start();
         }
     }
+
+    async updateEmployeeRole() {
+        try {
+            const [employees] = (await this.connection).execute('SELECT * FROM employee');
+            const [roles] = (await this.connection).execute('SELECT * FROM role');
+            const { employee, role } = await inquirer.prompt([ 
+                {
+                    name: 'employee',
+                    type: 'list',
+                    message: 'Which employee would you like to update?',
+                    choices: emmployees.map(employee => `${employee.first_name} ${employee.last_name}`)
+                },
+                {
+                    name: 'role',
+                    type: 'list',
+                    message: 'What is the employee"s new role?',
+                    choices: roles.map(role => role.title)
+                }
+            ]);
+            const employeeId = employees.find(e => `${e.first_name} ${e.last_name}` === employee).id;
+            const roleId = roles.find(r => r.title === role).id;
+
+            (await this.connection).execute('UPDATE employee SET role_id = ? WHERE id = ?', [roleId, employeeId]);
+            console.log(`Updated ${employee}'s role to ${role}.`);
+            this.start();
+        } catch (err) {
+            console.log(err);
+            this.start();
+        }
+    }
+}
+
+const employeeTracker = new EmployeeTracker();
+employeeTracker.start();
