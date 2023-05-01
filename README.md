@@ -44,7 +44,7 @@ THEN I am prompted to select an employee to update and their new role and this i
 4. Set up your database by running the command "mysql -u root -p" in the command line.
 5. Once in MySQL, run the command "SOURCE db/schema.sql" to create the database schema. Then run the command "SOURCE db/seeds.sql to seed the data.
 6. Exit MySQL by typing "quit". 
-7. Start the application by running the command "npm start" in the command line.
+7. Start the application by running the command "node index.js" OR "npm start" in the command line.
 8. Follow the prompts to view and manage departments, roles, and employees in your company.
 
 ## Usage
