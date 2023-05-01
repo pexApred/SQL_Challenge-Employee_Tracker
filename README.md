@@ -50,11 +50,8 @@ THEN I am prompted to select an employee to update and their new role and this i
 ## Usage
 
 Once the application is running, users can navigate the differnt options using the arrow keys and enter key on their keyboard. they can view, add, or update departments, roles, and employees as needed. Link to walkthrough below:
+https://drive.google.com/file/d/19a36r01qELKqNa29ODaj_ymk1OJa5Cw5/view
 
-
-    ```md
-    ![alt text](assets/images/screenshot.png)
-    ```
 
 ## Credits
 

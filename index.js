@@ -157,10 +157,7 @@ class EmployeeTracker {
                 },
 
             ]);
-            console.log(departments);
-            console.log (department.list);
             const chosenDpmt = departments.find(dept => dept.name === department.list);
-            console.log(chosenDpmt);
 
             await connection.execute('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [title, salary, chosenDpmt.id]);
             console.log(`Added ${title} role to the database.`);
