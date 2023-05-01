@@ -66,7 +66,8 @@ class EmployeeTracker {
 
     async viewAllDepartments () {
         try {
-            const [rows, fields] = await this.connection.execute('SELECT * FROM department');
+            const connection = await this.connection;
+            const [rows, fields] = await connection.execute('SELECT * FROM department');
             console.table(rows);
             this.start();
         } catch (err) {
@@ -77,7 +78,8 @@ class EmployeeTracker {
 
     async viewAllRoles () {
         try {
-            const [rows, fields] = await this.connection.execute('SELECT role.id, role.title, department.name AS department, role.salary FROM role LEFT JOIN department ON role.department_id = department.id');
+            const connection = await this.connection;
+            const [rows, fields] = await connection.execute('SELECT role.id, role.title, department.name AS department, role.salary FROM role LEFT JOIN department ON role.department_id = department.id');
             console.table(rows);
             this.start();
         } catch (err) {
@@ -88,7 +90,8 @@ class EmployeeTracker {
 
     async viewAllEmployees () {
         try {
-            const [rows, fields] = await this.connection.execute('SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT (manager.first_name, " ", manager.last_name) AS manager FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id LEFT JOIN employee manager ON employee.manager_id = manager.id');
+            const connection = await this.connection;
+            const [rows, fields] = await connection.execute('SELECT employee.id, employee.first_name, employee.last_name, role.title, department.name AS department, role.salary, CONCAT (manager.first_name, " ", manager.last_name) AS manager FROM employee LEFT JOIN role ON employee.role_id = role.id LEFT JOIN department ON role.department_id = department.id LEFT JOIN employee manager ON employee.manager_id = manager.id');
             console.table(rows);
             this.start();
         } catch (err) {
@@ -99,13 +102,14 @@ class EmployeeTracker {
 
     async addDepartment () {
         try {
+            const connection = await this.connection;
             const { name } = await inquirer.prompt({
                 name: 'name',
                 type: 'input',
                 message: 'What is the name of the department?'
             });
 
-            await this.connection.execute('INSERT INTO department (name) VALUES (?)', [name]);
+            connection.execute('INSERT INTO department (name) VALUES (?)', [name]);
             console.log(`Added ${name} department to the database.`);
             this.start();
         } catch (err) {
@@ -116,7 +120,8 @@ class EmployeeTracker {
 
     async addRole () {
         try {
-            const [departments] = await this.connection.execute('SELECT * FROM department');
+            const connection = await this.connection;
+            const [departments] = await connection.execute('SELECT * FROM department');
             const department = await inquirer.prompt ({
                 name: 'list',
                 message: 'WHich department does the role belong to?',
@@ -136,10 +141,12 @@ class EmployeeTracker {
                 },
 
             ]);
+            console.log(departments);
+            console.log (department.list);
+            const chosenDpmt = departments.find(dept => dept.name === department.list);
+            console.log(chosenDpmt);
 
-            const departmentId = departments.find(dept => dept.name === department).id;
-
-            await this.connection.execute('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [title, salary, departmentId]);
+            await connection.execute('INSERT INTO role (title, salary, department_id) VALUES (?, ?, ?)', [title, salary, chosenDpmt.id]);
             console.log(`Added ${title} role to the database.`);
             this.start();
         } catch (err) {
@@ -150,8 +157,9 @@ class EmployeeTracker {
 
     async addEmployee () {
         try {
-            const [roles] = (await this.connection).execute('SELECT * FROM role');
-            const [employees] = (await this.connection).execute('SELECT * FROM employee');
+            const connection = await this.connection;
+            const [roles] = await connection.execute('SELECT * FROM role');
+            const [employees] = await connection.execute('SELECT * FROM employee');
             const { firstName, lastName, role, manager } = await inquirer.prompt ([
                 {
                     name: 'firstName',
@@ -180,7 +188,7 @@ class EmployeeTracker {
             const roleId = roles.find(r => r.title === role).id;
             const managerId = employees.find(e => `${e.first_name} ${e.last_name}` === manager).id;
             
-            (await this.connection).execute('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [firstName, lastName, roleId, managerId]);
+            await connection.execute('INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)', [firstName, lastName, roleId, managerId]);
             console.log(`Added ${firstName} ${lastName} to the database.`);
             this.start();
         } catch (err) {
@@ -191,14 +199,15 @@ class EmployeeTracker {
 
     async updateEmployeeRole() {
         try {
-            const [employees] = (await this.connection).execute('SELECT * FROM employee');
-            const [roles] = (await this.connection).execute('SELECT * FROM role');
+            const connection = await this.connection;
+            const [employees] = await connection.execute('SELECT * FROM employee');
+            const [roles] = await connection.execute('SELECT * FROM role');
             const { employee, role } = await inquirer.prompt([ 
                 {
                     name: 'employee',
                     type: 'list',
                     message: 'Which employee would you like to update?',
-                    choices: emmployees.map(employee => `${employee.first_name} ${employee.last_name}`)
+                    choices: employees.map(employee => `${employee.first_name} ${employee.last_name}`)
                 },
                 {
                     name: 'role',
@@ -210,7 +219,7 @@ class EmployeeTracker {
             const employeeId = employees.find(e => `${e.first_name} ${e.last_name}` === employee).id;
             const roleId = roles.find(r => r.title === role).id;
 
-            (await this.connection).execute('UPDATE employee SET role_id = ? WHERE id = ?', [roleId, employeeId]);
+            await connection.execute('UPDATE employee SET role_id = ? WHERE id = ?', [roleId, employeeId]);
             console.log(`Updated ${employee}'s role to ${role}.`);
             this.start();
         } catch (err) {

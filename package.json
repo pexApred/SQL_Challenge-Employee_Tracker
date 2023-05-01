@@ -1,10 +1,11 @@
 {
   "name": "sql_challenge-employee_tracker",
   "version": "1.0.0",
-  "description": "",
+  "description": "User Story AS A business owner I WANT to be able to view and manage the departments, roles, and employees in my company SO THAT I can organize and plan my business",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node index.js"
   },
   "keywords": [],
   "author": "",
@@ -13,5 +14,6 @@
     "console.table": "^0.10.0",
     "inquirer": "^8.2.4",
     "mysql2": "^3.2.3"
-  }
+  },
+  "devDependencies": {}
 }
